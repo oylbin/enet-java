@@ -5,3 +5,6 @@ out/
 src/jni.c
 build/
 libenet.so
+.idea/
+*.swp
+enet-java.iml
