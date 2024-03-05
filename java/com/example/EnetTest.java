@@ -22,16 +22,19 @@ public class EnetTest {
             result = result << 8 | (b & 0xFF);
         }
         address.setHost(result);
+        address.setHost(0);
         address.setPort(5678);
         long max_clients = 32;
         System.out.printf("host[%d], port[%d]\n", address.getHost(), address.getPort());
         // wait for user input
+        /*
         System.out.println("Press any key to continue...");
         try {
             System.in.read();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        */
         ENetHost host = enet.enet_host_create(address, max_clients, 2, 0, 0);
         if (host == null) {
             System.out.println("enet host create failed");
@@ -39,9 +42,22 @@ public class EnetTest {
         }
         System.out.printf("enet host create: %d, port[%d]\n", ret, host.getAddress().getPort());
         ENetEvent event = new ENetEvent();
-        ret = enet.enet_host_service(host, event, 1000);
-        System.out.printf("enet host service: %d\n", ret);
 
+        while(true){
+            ret = enet.enet_host_service(host, event, 1000);
+            System.out.printf("enet host service: %d\n", ret);
+            ENetEventType t = event.getType();
+            if(t.equals(ENetEventType.ENET_EVENT_TYPE_CONNECT)){
+                //System.out.printf("\n", event.getPeer().getAddress().getHost());
+                System.out.println("connected");
+            }else if(t.equals(ENetEventType.ENET_EVENT_TYPE_RECEIVE)){
+                ENetPacket packet = event.getPacket();
+
+                System.out.printf("received %d bytes\n", packet.getDataLength());
+//                System.out.printf("%d", packet.getData().length);
+            }
+
+        }
 
 //        System.out.printf("enet address set host: %d\n", ret);
         // ret = enet.enet_address_set_host_ip(enet_address_set_host_ip)
