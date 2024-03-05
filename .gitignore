@@ -1,5 +1,7 @@
 libs/
 obj/
-java/
+java/org/
+out/
 src/jni.c
 build/
+libenet.so
