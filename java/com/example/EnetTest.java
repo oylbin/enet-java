@@ -52,18 +52,13 @@ public class EnetTest {
                 System.out.println("connected");
             }else if(t.equals(ENetEventType.ENET_EVENT_TYPE_RECEIVE)){
                 ENetPacket packet = event.getPacket();
-
                 System.out.printf("received %d bytes\n", packet.getDataLength());
-//                System.out.printf("%d", packet.getData().length);
+                // can not get packet->data, it is ignored in src/swag.i
+                //          %ignore _ENetPacket::data;
+                // remove this line does not work.
+                // I don't know how to resolve it.
+                // https://stackoverflow.com/questions/11965992/convert-a-member-of-structure-of-type-signed-char-to-byte-array-in-java-byte?rq=3
             }
-
         }
-
-//        System.out.printf("enet address set host: %d\n", ret);
-        // ret = enet.enet_address_set_host_ip(enet_address_set_host_ip)
-        //System.out.printf("enet address host: %s\n", enet.enet_address_get_host(address));
-
-
-
     }
 }
