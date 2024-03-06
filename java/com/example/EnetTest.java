@@ -53,20 +53,21 @@ public class EnetTest {
         System.out.printf("enet host create: %d, port[%d]\n", ret, host.getAddress().getPort());
         ENetEvent event = new ENetEvent();
 
-        // https://swig.org/Doc4.0/SWIGDocumentation.html#Java_binary_char
-        byte[] data = "hi\0jk".getBytes();
-        enet.binaryChar1(data);
 
         while(true){
-            ret = enet.enet_host_service(host, event, 1000);
+            ret = enet.enet_host_service(host, event, 5000);
             System.out.printf("enet host service: %d\n", ret);
             ENetEventType t = event.getType();
             if(t.equals(ENetEventType.ENET_EVENT_TYPE_CONNECT)){
-                //System.out.printf("\n", event.getPeer().getAddress().getHost());
-                System.out.println("connected");
+                String name = "client"+event.getPeer().getIncomingPeerID();
+                System.out.printf("%s connected\n", name);
+                String message = "hello, " + name;
+                ENetPacket p = enet.enet_packet_create(message.getBytes(), enetJNI.ENET_PACKET_FLAG_RELIABLE_get());
+                enet.enet_peer_send(event.getPeer(), (short)0, p);
             }else if(t.equals(ENetEventType.ENET_EVENT_TYPE_RECEIVE)){
                 ENetPacket packet = event.getPacket();
-                System.out.printf("received %d bytes\n", packet.getDataLength());
+                String name = "client"+event.getPeer().getIncomingPeerID();
+                System.out.printf("received %d bytes from %s\n", packet.getDataLength(), name);
                 // packet->data is ignored in src/swag.i
                 //          %ignore _ENetPacket::data;
                 // remove this line does not work. I don't know how to resolve it.
@@ -75,12 +76,22 @@ public class EnetTest {
                 // Now I find another solution by create a C function
                 // `size_t enet_get_packet_data(ENetPacket *p, char data[], size_t len)`
                 // see src/swig.i for details.
+                // https://swig.org/Doc4.0/SWIGDocumentation.html#Java_binary_char
 
                 byte[] bytes = new byte[(int) packet.getDataLength()];
                 enet.enet_get_packet_data(packet, bytes);
-                System.out.println("bytes = " + print(bytes));
                 System.out.println("string = " + new String(bytes, Charset.defaultCharset()));
+                String msg = "server received "+ packet.getDataLength() + " bytes from you.";
+                ENetPacket p = enet.enet_packet_create(msg.getBytes(), enetJNI.ENET_PACKET_FLAG_RELIABLE_get());
+                enet.enet_peer_send(event.getPeer(), (short)0, p);
 
+                // send a packet to all clients
+                String broadcastMsg = name + ": " + new String(bytes, Charset.defaultCharset());
+                ENetPacket p1 = enet.enet_packet_create(broadcastMsg.getBytes(), enetJNI.ENET_PACKET_FLAG_RELIABLE_get());
+                enet.enet_host_broadcast(host, (short)0, p1);
+            }else if(t.equals(ENetEventType.ENET_EVENT_TYPE_DISCONNECT)){
+                String name = "client"+event.getPeer().getIncomingPeerID();
+                System.out.printf("%s disconnected\n", name);
             }
         }
     }

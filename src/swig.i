@@ -133,37 +133,19 @@
 %include <enet/enet.h>
 
 // https://swig.org/Doc4.0/SWIGDocumentation.html#Java_binary_char
-%apply (char *STRING, size_t LENGTH) { (const char data[], size_t len) }
 %apply (char *STRING, size_t LENGTH) { (char data[], size_t len) }
 %inline %{
-void binaryChar1(const char data[], size_t len) {
-  printf("len: %ld data: ", len);
-  for (size_t i=0; i<len; ++i)
-    printf("%x ", data[i]);
-  printf("\n");
-}
 size_t enet_get_packet_data(ENetPacket *p, char data[], size_t len) {
-  printf("len: %ld data: ", len);
-  for (size_t i=0; i<len; ++i)
-    printf("%x ", data[i]);
-  printf("\n");
   if (p == NULL){
-      printf("packet is null\n");
       return 0;
   }
   if (p->data == NULL){
-      printf("packet data is null\n");
       return 0;
   }
   if( len > p->dataLength ){
     len = p->dataLength;
   }
-  for (size_t i=0; i< len; ++i)
-  {
-    printf("%x ", p->data[i]);
-    data[i] = p->data[i];
-  }
-  printf("\n");
+  memcpy(data, p->data, len);
   return len;
 }
 %}
