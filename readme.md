@@ -9,6 +9,16 @@ The java source files will be on the "java" directory while the binaries will be
 
 ## Test
 
+The following commands are tested on Ubuntu 20.04.
+
 ```
-make swig javac test
+sudo apt-get install swig
+sudo apt-get install openjdk-11-jdk-headless
+make swig JDK_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+
+# start server
+make javac server
+
+# start client
+make javac client 
 ```

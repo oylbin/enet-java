@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.8.12...3.20)
 
+if (NOT EXISTS  "${JDK_HOME}/include/jni.h")
+    message(FATAL_ERROR "JDK_HOME is not set or invalid, please make sure ${JDK_HOME}/include/jni.h exists.")
+endif()
+
 project(enet)
 
 # The "configure" step.

@@ -5,7 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
-public class EnetTest {
+public class EnetTestServer {
     static {
         System.loadLibrary("enet");
     }
