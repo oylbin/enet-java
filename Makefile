@@ -11,4 +11,6 @@ javac:
 
 test:
 	java -Dfile.encoding=UTF-8 -classpath out/ com.example.EnetTest
-	#java -Dfile.encoding=UTF-8 -classpath out/ com.example.EnetDemoChatServer
+
+client:
+	java -Dfile.encoding=UTF-8 -classpath out/ com.example.EnetTestClient
